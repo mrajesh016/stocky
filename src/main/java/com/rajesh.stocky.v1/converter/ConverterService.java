@@ -1,8 +1,10 @@
 package com.rajesh.stocky.v1.converter;
 
 import com.rajesh.stocky.v1.entity.Stock;
+import com.rajesh.stocky.v1.model.CreateStockRequestDTO;
 import com.rajesh.stocky.v1.model.StockDTO;
 import com.rajesh.stocky.v1.model.StockRequestDTO;
+import com.rajesh.stocky.v1.model.UpdateStockRequestDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.expression.ParseException;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,7 @@ public class ConverterService {
 
     private ModelMapper modelMapper = new ModelMapper();
 
-    public Stock convertToEntity(StockRequestDTO stockRequestDTO) throws ParseException {
+    public Stock convertToEntity(CreateStockRequestDTO stockRequestDTO) throws ParseException {
         Stock stock = modelMapper.map(stockRequestDTO, Stock.class);
         return stock;
     }
@@ -22,7 +24,7 @@ public class ConverterService {
         return stockInfoDTO;
     }
 
-    public Stock updateStock(Stock stock, StockRequestDTO stockRequestDTO) {
+    public Stock updateStock(Stock stock, UpdateStockRequestDTO stockRequestDTO) {
         if(stockRequestDTO.getName()!=null)
             stock.setStockName(stockRequestDTO.getName());
         if(stockRequestDTO.getCurrentPrice()!=null)

@@ -60,7 +60,7 @@ paths:
         name: StockRequest
         description: Stock to create
         schema:
-          $ref: '#/definitions/StockRequestDTO'
+          $ref: '#/definitions/CreateStockRequestDTO'
       responses:
         '200':
           description: Stock Created Successfully
@@ -115,7 +115,7 @@ paths:
         name: StockRequest
         description: Stock to create
         schema:
-          $ref: '#/definitions/StockRequestDTO'
+          $ref: '#/definitions/UpdateStockRequestDTO'
       responses:
         '200':
           description: Stock was successfully updated
@@ -214,4 +214,21 @@ definitions:
         type: number
         format: double
         description: current stockPrice
+
+  CreateStockRequestDTO:
+    properties:
+      name:
+        type: string
+        description: name of the stock
+      currentPrice:
+        type: number
+        format: double
+        description: current stockPrice
+    required:
+    - name
+    - currentPrice
+
+  UpdateStockRequestDTO:
+    allOf:
+    - $ref: '#/definitions/StockRequestDTO'
 

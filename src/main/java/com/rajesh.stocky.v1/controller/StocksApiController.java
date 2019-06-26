@@ -3,9 +3,7 @@ package com.rajesh.stocky.v1.controller;
 import com.rajesh.stocky.v1.StocksApi;
 import com.rajesh.stocky.v1.converter.ConverterService;
 import com.rajesh.stocky.v1.entity.Stock;
-import com.rajesh.stocky.v1.model.StockDTO;
-import com.rajesh.stocky.v1.model.StockListResponseDTO;
-import com.rajesh.stocky.v1.model.StockRequestDTO;
+import com.rajesh.stocky.v1.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rajesh.stocky.v1.service.IStockService;
 import io.swagger.annotations.*;
@@ -47,7 +45,7 @@ public class StocksApiController implements StocksApi {
         this.request = request;
     }
 
-    public ResponseEntity<StockDTO> createStock(@ApiParam(value = "Stock to create"  )  @Valid @RequestBody StockRequestDTO createStockRequest) {
+    public ResponseEntity<StockDTO> createStock(@ApiParam(value = "Stock to create"  )  @Valid @RequestBody CreateStockRequestDTO createStockRequest) {
         String accept = request.getHeader("Accept");
         Stock stock = null;
         StockDTO response;
@@ -134,7 +132,7 @@ public class StocksApiController implements StocksApi {
         return new ResponseEntity<StockListResponseDTO>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<StockDTO> updateStockById(@ApiParam(value = "",required=true) @PathVariable("stockId") Integer stockId, @ApiParam(value = "Update Stock Request"  ) @RequestBody StockRequestDTO stockRequestDTO) {
+    public ResponseEntity<StockDTO> updateStockById(@ApiParam(value = "",required=true) @PathVariable("stockId") Integer stockId, @ApiParam(value = "Update Stock Request"  ) @RequestBody UpdateStockRequestDTO stockRequestDTO) {
         String accept = request.getHeader("Accept");
         Stock stock = null;
         StockDTO response = new StockDTO();
