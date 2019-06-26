@@ -197,12 +197,13 @@ definitions:
         size:
           type: integer
           minimum: 0
-        page:
+        number:
           type: integer
         totalPages:
           type: integer
-        totalSize:
+        totalElements:
           type: integer
+          format: int64
 
   StockRequestDTO:
     properties:

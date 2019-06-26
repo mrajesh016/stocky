@@ -12,6 +12,9 @@ import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,7 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class StocksApiController implements StocksApi {
@@ -46,8 +50,7 @@ public class StocksApiController implements StocksApi {
     public ResponseEntity<StockDTO> createStock(@ApiParam(value = "Stock to create"  )  @Valid @RequestBody StockRequestDTO createStockRequest) {
         String accept = request.getHeader("Accept");
         Stock stock = null;
-        StockDTO response = new StockDTO();
-        System.out.println(" Stock Request :"+ createStockRequest.toString());
+        StockDTO response;
         if (accept != null && accept.contains("application/json"))
             stock = stockService.saveStock(converterService.convertToEntity(createStockRequest));
 
@@ -101,16 +104,34 @@ public class StocksApiController implements StocksApi {
 
     public ResponseEntity<StockListResponseDTO> getStocksList(@Min(0)@ApiParam(value = "0 based page index.", defaultValue = "0") @Valid @RequestParam(value = "page", required = false, defaultValue="0") Integer page, @Min(1)@ApiParam(value = "size of the page to be returned.", defaultValue = "25") @Valid @RequestParam(value = "size", required = false, defaultValue="25") Integer size) {
         String accept = request.getHeader("Accept");
+        StockListResponseDTO response = new StockListResponseDTO();
+        List<StockDTO> stocksDTOList = new ArrayList<StockDTO>();
+
         if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<StockListResponseDTO>(objectMapper.readValue("\"\"", StockListResponseDTO.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<StockListResponseDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
+            Pageable pageableRequest = PageRequest.of(page, size);
+            Page<Stock> stocks = stockService.findAll(pageableRequest);
+
+            if (page > stocks.getTotalPages()) {
+                response.setStatusCode(404);
+                response.setMessage("The page asked for is out of Bounds.");
+                return new ResponseEntity<StockListResponseDTO>(response, HttpStatus.NOT_FOUND);
             }
+
+            List<Stock> stockList = stocks.getContent();
+            for (Stock stock : stockList) {
+                StockDTO stockDTO = converterService.convertToDto(stock);
+                stocksDTOList.add(stockDTO);
+            }
+            response.setStatusCode(200);
+            response.setMessage("Successful response of stocks list with pagination");
+            response.setStocksList(stocksDTOList);
+            response.setNumber(stocks.getNumber());
+            response.setSize(stocks.getSize());
+            response.setTotalPages(stocks.getTotalPages());
+            response.setTotalElements(stocks.getTotalElements());
         }
 
-        return new ResponseEntity<StockListResponseDTO>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<StockListResponseDTO>(response, HttpStatus.OK);
     }
 
     public ResponseEntity<StockDTO> updateStockById(@ApiParam(value = "",required=true) @PathVariable("stockId") Integer stockId, @ApiParam(value = "Update Stock Request"  ) @RequestBody StockRequestDTO stockRequestDTO) {
