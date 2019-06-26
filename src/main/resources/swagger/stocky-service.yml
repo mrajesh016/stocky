@@ -1,0 +1,216 @@
+swagger: '2.0'
+info:
+  title: Stocky
+  description: Simple Stock Service
+  version: 1.0.0
+  contact:
+    email: rajesh.cseiitkgp@gmail.com
+host: 'localhost:8080'
+basePath: /v1
+schemes:
+- https
+
+produces:
+- application/json
+
+paths:
+  /api/stocks/:
+    get:
+      tags:
+      - stocks
+      summary: List of all of stocks
+      operationId: getStocksList
+      parameters:
+      - in: query
+        name: page
+        description: 0 based page index.
+        type: integer
+        required: false
+        minimum: 0
+        default: 0
+
+      - in: query
+        name: size
+        description: size of the page.
+        type: integer
+        required: false
+        minimum: 1
+        default: 10
+      responses:
+        '200':
+          description: Successful response with pagination.
+          schema:
+            $ref: '#/definitions/StockListResponseDTO'
+        '401':
+          description: You user is not Authorized
+        '403':
+          description: You don't have the permission on this resource
+        '500':
+          description: Internal Server Error
+
+    post:
+      tags:
+      - stocks
+      summary: Create a stock
+      operationId: createStock
+      consumes:
+      - application/json
+      parameters:
+      - in: body
+        name: StockRequest
+        description: Stock to create
+        schema:
+          $ref: '#/definitions/StockRequestDTO'
+      responses:
+        '200':
+          description: Stock Created Successfully
+          schema:
+            $ref: '#/definitions/StockDTO'
+        '400':
+          description: Request is not correct
+        '401':
+          description: You user is not Authorized
+        '403':
+          description: You don't have the permission on this resource
+        '500':
+          description: Internal Server Error
+
+  '/api/stocks/{stockId}':
+    get:
+      tags:
+      - stocks
+      summary: Returns Stock by ID
+      operationId: getStockById
+      parameters:
+      - in: path
+        name: stockId
+        required: true
+        type: integer
+      responses:
+        '200':
+          description: Stock was successfully found
+          schema:
+            $ref: '#/definitions/StockDTO'
+        '401':
+          description: You user is not Authorized
+        '403':
+          description: You don't have the permission on this resource
+        '404':
+          description: There is no stock for given stockId
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+      - stocks
+      summary: Update a stock
+      operationId: updateStockById
+      consumes:
+      - application/json
+      parameters:
+      - in: path
+        name: stockId
+        required: true
+        type: integer
+      - in: body
+        name: StockRequest
+        description: Stock to create
+        schema:
+          $ref: '#/definitions/StockRequestDTO'
+      responses:
+        '200':
+          description: Stock was successfully updated
+          schema:
+            $ref: '#/definitions/StockDTO'
+        '400':
+          description: Request is not correct
+        '401':
+          description: You user is not Authorized
+        '403':
+          description: You don't have the permission on this resource
+        '404':
+          description: There is no stock for given stockId
+        '500':
+          description: Internal Server Error
+
+    delete:
+      tags:
+      - stocks
+      summary: Delete a stock
+      operationId: deleteStockById
+      parameters:
+      - in: path
+        name: stockId
+        required: true
+        type: integer
+      responses:
+        '200':
+          description: Stock was successfully deleted
+          schema:
+            $ref: '#/definitions/StockDTO'
+        '401':
+          description: You user is not Authorized
+        '403':
+          description: You don't have the permission on this resource
+        '404':
+          description: There is no stock for given stockId
+        '500':
+          description: Internal Server Error
+
+definitions:
+
+  AbstractResponseDTO:
+    properties:
+      statusCode:
+        type: integer
+        description: http response code
+      message:
+        type: string
+        description: http response message
+
+  StockDTO:
+    allOf:
+    - $ref: '#/definitions/AbstractResponseDTO'
+    - properties:
+        id:
+          type: integer
+          description: unique identifier of a stock entity
+        name:
+          type: string
+          description: name of the stock
+        currentPrice:
+          type: number
+          format: double
+          description: current stockPrice
+        lastUpdated:
+          type: string
+          format: date-time
+          description: '2019-06-25T17:32:28Z'
+
+  StockListResponseDTO:
+    allOf:
+    - $ref: '#/definitions/AbstractResponseDTO'
+    - properties:
+        stocksList:
+          type: array
+          items:
+            $ref: '#/definitions/StockDTO'
+        size:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+        totalPages:
+          type: integer
+        totalSize:
+          type: integer
+
+  StockRequestDTO:
+    properties:
+      name:
+        type: string
+        description: name of the stock
+      currentPrice:
+        type: number
+        format: double
+        description: current stockPrice
+
