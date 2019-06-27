@@ -27,13 +27,8 @@ public class StockServiceImpl implements IStockService {
     }
 
     @Override
-    public Stock getStockById(int stockId) {
+    public Stock getStockById(Long stockId) {
         return stockRepository.findById(stockId);
-    }
-
-    @Override
-    public List<Stock> getStocksList(Integer page, Integer size) {
-        return null;
     }
 
     @Override

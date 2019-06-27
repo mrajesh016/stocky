@@ -8,7 +8,6 @@ import java.util.List;
 public interface IStockService{
     Stock saveStock(Stock stock);
     void deleteStock(Stock stock);
-    Stock getStockById(int stockId);
-    List<Stock> getStocksList(Integer page, Integer size);
+    Stock getStockById(Long stockId);
     Page<Stock> findAll(Pageable pageableRequest);
 }

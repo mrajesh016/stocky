@@ -5,5 +5,5 @@ import com.rajesh.stocky.v1.entity.Stock;
 
 
 public interface StockRepository extends JpaRepository<Stock, String> {
-   Stock findById(Integer id);
+   Stock findById(Long id);
 }

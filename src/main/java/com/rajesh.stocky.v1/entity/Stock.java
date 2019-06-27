@@ -11,7 +11,7 @@ public class Stock implements Serializable {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name="id")
-    private Integer id;
+    private Long id;
 
     @Column(name="stock_name")
     private String stockName;
@@ -22,11 +22,11 @@ public class Stock implements Serializable {
     @Column(name="last_updated")
     private OffsetDateTime lastUpdated;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

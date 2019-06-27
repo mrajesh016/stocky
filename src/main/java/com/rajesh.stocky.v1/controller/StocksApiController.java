@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -45,118 +46,73 @@ public class StocksApiController implements StocksApi {
         this.request = request;
     }
 
-    public ResponseEntity<StockDTO> createStock(@ApiParam(value = "Stock to create"  )  @Valid @RequestBody CreateStockRequestDTO createStockRequest) {
-        String accept = request.getHeader("Accept");
-        Stock stock = null;
-        StockDTO response;
-        if (accept != null && accept.contains("application/json"))
-            stock = stockService.saveStock(converterService.convertToEntity(createStockRequest));
+    public ResponseEntity<StockDetailResponse> createStock(@ApiParam(value = "Stock to create"  )  @Valid @RequestBody CreateStockRequestDTO createStockRequest) {
 
-        response = converterService.convertToDto(stock);
-        response.setStatusCode(201);
-        response.setMessage("Stock Successfully Created at /api/stock/"+stock.getId());
-        return new ResponseEntity<StockDTO>(response, HttpStatus.CREATED );
+        StockDetailResponse response;
+        Stock stock = stockService.saveStock(converterService.convertToEntity(createStockRequest));
+        response = converterService.convertToResponseDTO(stock);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @Transactional
-    public ResponseEntity<StockDTO> deleteStockById(@ApiParam(value = "",required=true) @PathVariable("stockId") Integer stockId) {
-        String accept = request.getHeader("Accept");
-        Stock stock = null;
-        StockDTO response = new StockDTO();
+    public ResponseEntity<Void> deleteStockById(@ApiParam(value = "",required=true) @PathVariable("stockId") Long stockId) {
 
-        if (accept != null && accept.contains("application/json")) {
-            stock = stockService.getStockById(stockId);
-            if (stock == null) {
-                response.setStatusCode(404);
-                response.setMessage("No Stock exists with the given ID");
-                return new ResponseEntity<StockDTO>(response, HttpStatus.NOT_FOUND );
-            }
-            stockService.deleteStock(stock);
-        }
+        Stock stock = stockService.getStockById(stockId);
+        if (stock == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId.");
 
-        response = converterService.convertToDto(stock);
-        response.setStatusCode(200);
-        response.setMessage("Successfully deleted stock at /api/stock/"+stockId);
-        return new ResponseEntity<StockDTO>(response, HttpStatus.OK );
+        stockService.deleteStock(stock);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    public ResponseEntity<StockDTO> getStockById(@ApiParam(value = "",required=true) @PathVariable("stockId") Integer stockId) {
-        String accept = request.getHeader("Accept");
-        Stock stock = null;
-        StockDTO response = new StockDTO();
+    public ResponseEntity<StockDetailResponse> getStockById(@ApiParam(value = "",required=true) @PathVariable("stockId") Long stockId) {
 
-        if (accept != null && accept.contains("application/json")) {
-            stock = stockService.getStockById(stockId);
-            if (stock == null) {
-                response.setStatusCode(404);
-                response.setMessage("No Stock exists with the given ID");
-                return new ResponseEntity<StockDTO>(response, HttpStatus.NOT_FOUND );
-            }
-        }
+        StockDetailResponse response = new StockDetailResponse();
+        Stock stock = stockService.getStockById(stockId);
+        if (stock == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId.");
 
-        response = converterService.convertToDto(stock);
-        response.setStatusCode(200);
-        response.setMessage("Successfully found stock at /api/stock/"+stockId);
-        return new ResponseEntity<StockDTO>(response, HttpStatus.OK);
+        response = converterService.convertToResponseDTO(stock);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<StockListResponseDTO> getStocksList(@Min(0)@ApiParam(value = "0 based page index.", defaultValue = "0") @Valid @RequestParam(value = "page", required = false, defaultValue="0") Integer page, @Min(1)@ApiParam(value = "size of the page to be returned.", defaultValue = "25") @Valid @RequestParam(value = "size", required = false, defaultValue="25") Integer size) {
-        String accept = request.getHeader("Accept");
-        StockListResponseDTO response = new StockListResponseDTO();
-        List<StockDTO> stocksDTOList = new ArrayList<StockDTO>();
+    public ResponseEntity<StockListResponse> getStocksList(@Min(0)@ApiParam(value = "0 based page index.", defaultValue = "0") @Valid @RequestParam(value = "page", required = false, defaultValue="0") Integer page, @Min(1) @Max(100)@ApiParam(value = "size of the page to be returned.", defaultValue = "25") @Valid @RequestParam(value = "size", required = false, defaultValue="25") Integer size) {
 
-        if (accept != null && accept.contains("application/json")) {
-            Pageable pageableRequest = PageRequest.of(page, size);
-            Page<Stock> stocks = stockService.findAll(pageableRequest);
+        StockListResponse response = new StockListResponse();
+        List<StockDetailResponse> stocksDTOList = new ArrayList<>();
 
-            if (page > stocks.getTotalPages()) {
-                response.setStatusCode(404);
-                response.setMessage("The page asked for is out of Bounds.");
-                return new ResponseEntity<StockListResponseDTO>(response, HttpStatus.NOT_FOUND);
-            }
+        if (size > 100)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page size should be between 1 to 100.");
+        Pageable pageableRequest = PageRequest.of(page, size);
+        Page<Stock> stocks = stockService.findAll(pageableRequest);
+        if (page >= stocks.getTotalPages() && page!=0)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested page is out of bounds.");
 
-            List<Stock> stockList = stocks.getContent();
-            for (Stock stock : stockList) {
-                StockDTO stockDTO = converterService.convertToDto(stock);
-                stocksDTOList.add(stockDTO);
-            }
-            response.setStatusCode(200);
-            response.setMessage("Successful response of stocks list with pagination");
-            response.setStocksList(stocksDTOList);
-            response.setNumber(stocks.getNumber());
-            response.setSize(stocks.getSize());
-            response.setTotalPages(stocks.getTotalPages());
-            response.setTotalElements(stocks.getTotalElements());
+        List<Stock> stockList = stocks.getContent();
+        for (Stock stock : stockList) {
+            StockDetailResponse stockDTO = converterService.convertToResponseDTO(stock);
+            stocksDTOList.add(stockDTO);
         }
 
-        return new ResponseEntity<StockListResponseDTO>(response, HttpStatus.OK);
+        response.setStocksList(stocksDTOList);
+        response.setNumber(stocks.getNumber());
+        response.setSize(stocks.getSize());
+        response.setTotalPages(stocks.getTotalPages());
+        response.setTotalElements(stocks.getTotalElements());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<StockDTO> updateStockById(@ApiParam(value = "",required=true) @PathVariable("stockId") Integer stockId, @ApiParam(value = "Update Stock Request"  ) @RequestBody UpdateStockRequestDTO stockRequestDTO) {
-        String accept = request.getHeader("Accept");
-        Stock stock = null;
-        StockDTO response = new StockDTO();
+    public ResponseEntity<StockDetailResponse> updateStockById(@ApiParam(value = "",required=true) @PathVariable("stockId") Long stockId, @ApiParam(value = "Update Stock Request"  ) @RequestBody UpdateStockRequestDTO stockRequestDTO) {
 
-        if (accept != null && accept.contains("application/json")) {
-            if(stockRequestDTO.getCurrentPrice() == null && stockRequestDTO.getName()==null){
-                response.setStatusCode(400);
-                response.setMessage("Bad Request: Both price and name can't be null.");
-                return new ResponseEntity<StockDTO>(response, HttpStatus.BAD_REQUEST);
-            }
+        StockDetailResponse response = new StockDetailResponse();
+        Stock stock = stockService.getStockById(stockId);
+        if (stock == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId.");
 
-            stock = stockService.getStockById(stockId);
-            if (stock == null){
-                response.setStatusCode(404);
-                response.setMessage("No Stock exists with the given ID");
-                return new ResponseEntity<StockDTO>(response, HttpStatus.NOT_FOUND );
-            }
-            stock = stockService.saveStock(converterService.updateStock(stock, stockRequestDTO));
-        }
-
-        response = converterService.convertToDto(stock);
-        response.setStatusCode(200);
-        response.setMessage("Successfully updated stock at /api/stock/"+stockId);
-        return new ResponseEntity<StockDTO>(response, HttpStatus.OK);
+        stock = stockService.saveStock(converterService.updateStock(stock, stockRequestDTO));
+        response = converterService.convertToResponseDTO(stock);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
