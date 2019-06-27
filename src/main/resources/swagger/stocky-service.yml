@@ -13,12 +13,18 @@ schemes:
 produces:
 - application/json
 
+securityDefinitions:
+  basicAuth:
+    type: basic
+
 paths:
   /api/stocks/:
     get:
       tags:
       - stocks
       summary: List of all of stocks
+      security:
+      - basicAuth: []
       operationId: getStocksList
       parameters:
       - in: query
@@ -43,7 +49,7 @@ paths:
           schema:
             $ref: '#/definitions/StockListResponse'
         '401':
-          description: Your user is not Authorized.
+          description: User is not Authorized, Missing/Incorrect credentials.
           schema:
             $ref: '#/definitions/ErrorResponse'
         '403':
@@ -63,6 +69,8 @@ paths:
       tags:
       - stocks
       summary: Create a stock
+      security:
+      - basicAuth: []
       operationId: createStock
       consumes:
       - application/json
@@ -82,7 +90,7 @@ paths:
           schema:
             $ref: '#/definitions/ErrorResponse'
         '401':
-          description: Your user is not Authorized.
+          description: User is not Authorized, Missing/Incorrect credentials.
           schema:
             $ref: '#/definitions/ErrorResponse'
         '403':
@@ -99,6 +107,8 @@ paths:
       tags:
       - stocks
       summary: Returns Stock by ID
+      security:
+      - basicAuth: []
       operationId: getStockById
       parameters:
       - in: path
@@ -112,7 +122,7 @@ paths:
           schema:
             $ref: '#/definitions/StockDetailResponse'
         '401':
-          description: Your user is not Authorized.
+          description: User is not Authorized, Missing/Incorrect credentials.
           schema:
             $ref: '#/definitions/ErrorResponse'
         '403':
@@ -131,6 +141,8 @@ paths:
       tags:
       - stocks
       summary: Update a stock
+      security:
+      - basicAuth: []
       operationId: updateStockById
       consumes:
       - application/json
@@ -155,7 +167,7 @@ paths:
           schema:
             $ref: '#/definitions/ErrorResponse'
         '401':
-          description: Your user is not Authorized.
+          description: User is not Authorized, Missing/Incorrect credentials.
           schema:
             $ref: '#/definitions/ErrorResponse'
         '403':
@@ -175,6 +187,8 @@ paths:
       tags:
       - stocks
       summary: Delete a stock
+      security:
+      - basicAuth: []
       operationId: deleteStockById
       parameters:
       - in: path
