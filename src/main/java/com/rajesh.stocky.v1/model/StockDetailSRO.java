@@ -1,26 +1,13 @@
-package com.rajesh.stocky.v1.entity;
+package com.rajesh.stocky.v1.model;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-@Entity
-@Table(name = "stock")
-public class Stock implements Serializable {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    @Column(name="stockId")
+public class StockDetailSRO {
+
     private Long stockId;
-
-    @Column(name="stock_name")
     private String stockName;
-
-    @Column(name="current_price")
     private Double currentPrice;
-
-    @Column(name="last_updated")
     private OffsetDateTime lastUpdated;
 
     public Long getStockId() {
@@ -55,24 +42,23 @@ public class Stock implements Serializable {
         this.lastUpdated = lastUpdated;
     }
 
-    public Stock() {
-        this.lastUpdated = OffsetDateTime.now(Clock.systemDefaultZone());
+    public StockDetailSRO() {
     }
 
-    public Stock(String stockName, Double currentPrice) {
+    public StockDetailSRO(String stockName, Double currentPrice) {
         this.stockName = stockName;
         this.currentPrice = currentPrice;
-        this.lastUpdated = OffsetDateTime.now(Clock.systemDefaultZone());
+        this.lastUpdated = OffsetDateTime.now();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Stock stock = (Stock) o;
-        return Objects.equals(stockId, stock.stockId) &&
-                Objects.equals(stockName, stock.stockName) &&
-                Objects.equals(currentPrice, stock.currentPrice);
+        StockDetailSRO detailSRO = (StockDetailSRO) o;
+        return Objects.equals(stockId, detailSRO.stockId) &&
+                Objects.equals(stockName, detailSRO.stockName) &&
+                Objects.equals(currentPrice, detailSRO.currentPrice);
     }
 
     @Override
@@ -82,11 +68,12 @@ public class Stock implements Serializable {
 
     @Override
     public String toString() {
-        return "Stock{" +
-                "stockId='" + stockId + '\'' +
+        return "StockDetailSRO{" +
+                "stockId=" + stockId +
                 ", stockName='" + stockName + '\'' +
                 ", currentPrice=" + currentPrice +
                 ", lastUpdated=" + lastUpdated +
                 '}';
     }
 }
+
