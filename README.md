@@ -12,9 +12,7 @@ run `mvn spring-boot:run`
 http://localhost:8080/swagger-ui.html
 
 ## Integration & Unit Tests
-run `mvn clean verify` to run all unit and integration tests.
+`mvn clean verify` to run all unit and integration tests.
 
 ## Code Coverage
 view unit tests code coverage report at: `target/site/jacoco/index.html`.
-
-Change default port value in application.properties
