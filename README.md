@@ -3,7 +3,7 @@ Stock Service on Spring Boot
 All endpoints require Basic Auth credentials: stocky/stocky
 
 ## Build
-run `mvn clean generate-resources` 
+run `mvn clean package` 
 
 ## Run Stocky 
 run `mvn spring-boot:run`      
