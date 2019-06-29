@@ -1,12 +1,15 @@
 package com.rajesh.stocky.v1.converter;
 
 import com.rajesh.stocky.v1.entity.Stock;
-import com.rajesh.stocky.v1.model.*;
+import com.rajesh.stocky.v1.sro.*;
+import com.rajesh.stocky.v1.swagger.model.CreateStockRequestDTO;
+import com.rajesh.stocky.v1.swagger.model.StockDetailResponse;
+import com.rajesh.stocky.v1.swagger.model.StockListResponse;
+import com.rajesh.stocky.v1.swagger.model.UpdateStockRequestDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.expression.ParseException;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 

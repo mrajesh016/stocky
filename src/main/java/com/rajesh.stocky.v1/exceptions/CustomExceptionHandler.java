@@ -1,6 +1,6 @@
 package com.rajesh.stocky.v1.exceptions;
 
-import com.rajesh.stocky.v1.model.ErrorResponse;
+import com.rajesh.stocky.v1.swagger.model.ErrorResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

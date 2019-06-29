@@ -1,10 +1,14 @@
 package com.rajesh.stocky.v1.controller;
 
-import com.rajesh.stocky.v1.StocksApi;
+import com.rajesh.stocky.v1.swagger.api.StocksApi;
 import com.rajesh.stocky.v1.converter.ConverterService;
-import com.rajesh.stocky.v1.model.*;
+import com.rajesh.stocky.v1.sro.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rajesh.stocky.v1.service.IStockService;
+import com.rajesh.stocky.v1.swagger.model.CreateStockRequestDTO;
+import com.rajesh.stocky.v1.swagger.model.StockDetailResponse;
+import com.rajesh.stocky.v1.swagger.model.StockListResponse;
+import com.rajesh.stocky.v1.swagger.model.UpdateStockRequestDTO;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
-
 import javax.validation.constraints.*;
-import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
@@ -42,12 +44,11 @@ public class StocksApiController implements StocksApi {
         this.request = request;
     }
 
-    public ResponseEntity<StockDetailResponse> createStock(@ApiParam(value = "Stock to create"  )  @Valid @RequestBody CreateStockRequestDTO createStockRequest) {
+    public ResponseEntity<StockDetailResponse> createStock(@ApiParam(value = "Stock to create"  ) @RequestBody CreateStockRequestDTO createStockRequest) {
 
         StockDetailResponse response;
         StockDetailSRO stockDetailSRO = stockService.saveStock(converterService.convertToEntity(createStockRequest));
         response = converterService.convertToResponseDTO(stockDetailSRO);
-
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -73,7 +74,7 @@ public class StocksApiController implements StocksApi {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<StockListResponse> getStocksList(@Min(0)@ApiParam(value = "0 based page index.", defaultValue = "0") @Valid @RequestParam(value = "page", required = false, defaultValue="0") Integer page, @Min(1) @Max(100)@ApiParam(value = "size of the page to be returned.", defaultValue = "25") @Valid @RequestParam(value = "size", required = false, defaultValue="25") Integer size) {
+    public ResponseEntity<StockListResponse> getStocksList(@Min(0)@ApiParam(value = "0 based page index.", defaultValue = "0") @RequestParam(value = "page", required = false, defaultValue="0") Integer page, @Min(1) @Max(100)@ApiParam(value = "size of the page to be returned.", defaultValue = "25")  @RequestParam(value = "size", required = false, defaultValue="25") Integer size) {
 
         if (size > 100)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page size should be between 1 to 100.");

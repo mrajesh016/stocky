@@ -3,8 +3,8 @@ package com.rajesh.stocky.v1.service.Impl;
 
 import com.rajesh.stocky.v1.converter.ConverterService;
 import com.rajesh.stocky.v1.entity.Stock;
-import com.rajesh.stocky.v1.model.StockDetailSRO;
-import com.rajesh.stocky.v1.model.StocksDetailListSRO;
+import com.rajesh.stocky.v1.sro.StockDetailSRO;
+import com.rajesh.stocky.v1.sro.StocksDetailListSRO;
 import com.rajesh.stocky.v1.repository.StockRepository;
 import com.rajesh.stocky.v1.service.IStockService;
 import org.springframework.beans.factory.annotation.Autowired;

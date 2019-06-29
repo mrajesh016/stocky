@@ -1,8 +1,8 @@
 package com.rajesh.stocky.v1.service;
 
 import com.rajesh.stocky.v1.entity.Stock;
-import com.rajesh.stocky.v1.model.StockDetailSRO;
-import com.rajesh.stocky.v1.model.StocksDetailListSRO;
+import com.rajesh.stocky.v1.sro.StockDetailSRO;
+import com.rajesh.stocky.v1.sro.StocksDetailListSRO;
 import org.springframework.data.domain.Pageable;
 
 public interface IStockService{

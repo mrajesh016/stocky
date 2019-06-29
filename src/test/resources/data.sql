@@ -1,0 +1,3 @@
+insert into stock(stock_id, current_price, stock_name, last_updated) values(942876, 82.3, 'payconiqStockGetTest', '2019-06-29 19:20:21-02:00');
+insert into stock(stock_id, current_price, stock_name, last_updated) values(716833, 72.2, 'payconiqStockDeleteTest', '2019-06-29 19:20:21-02:00');
+insert into stock(stock_id, current_price, stock_name, last_updated) values(678223, 92.6, 'payconiqStockUpdateTest', '2019-06-29 19:20:21-02:00');
