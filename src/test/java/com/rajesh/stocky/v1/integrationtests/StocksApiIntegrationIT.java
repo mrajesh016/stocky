@@ -59,7 +59,7 @@ public class StocksApiIntegrationIT {
     }
 
     @Test
-    public void testGetStockByIdWhenExists() throws Exception {
+    public void testGetStockByIdWhenExists() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
@@ -72,7 +72,7 @@ public class StocksApiIntegrationIT {
     }
 
     @Test
-    public void testGetStockByIdWhenNotExists() throws Exception {
+    public void testGetStockByIdWhenNotExists() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
@@ -82,7 +82,7 @@ public class StocksApiIntegrationIT {
     }
 
     @Test
-    public void testDeleteStockByIdWhenExists() throws Exception {
+    public void testDeleteStockByIdWhenExists() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
@@ -92,7 +92,7 @@ public class StocksApiIntegrationIT {
     }
 
     @Test
-    public void testDeleteStockByIdWhenNotExists() throws Exception {
+    public void testDeleteStockByIdWhenNotExists() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
@@ -124,7 +124,7 @@ public class StocksApiIntegrationIT {
                 .queryParam("size", 40);
 
         ResponseEntity<StockListResponse> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, StockListResponse.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -136,7 +136,6 @@ public class StocksApiIntegrationIT {
                 .queryParam("page", 0)
                 .queryParam("size", 260);
         ResponseEntity<StockListResponse> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, StockListResponse.class);
-
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 

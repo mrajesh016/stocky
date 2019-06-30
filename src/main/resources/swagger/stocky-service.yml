@@ -31,15 +31,14 @@ paths:
         name: page
         description: 0 based page index.
         type: integer
-        required: false
+        required: true
         minimum: 0
         default: 0
-
       - in: query
         name: size
         description: size of the page.
         type: integer
-        required: false
+        required: true
         minimum: 1
         maximum: 100
         default: 10
@@ -48,16 +47,16 @@ paths:
           description: Successful response with pagination.
           schema:
             $ref: '#/definitions/StockListResponse'
+        '400':
+          description: Requested page/size is out of bounds.
+          schema:
+            $ref: '#/definitions/ErrorResponse'
         '401':
           description: User is not Authorized, Missing/Incorrect credentials.
           schema:
             $ref: '#/definitions/ErrorResponse'
         '403':
           description: You don't have the permission on this resource.
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        '404':
-          description: Requested page is out of bounds.
           schema:
             $ref: '#/definitions/ErrorResponse'
         '500':
@@ -77,12 +76,12 @@ paths:
       parameters:
       - in: body
         name: StockRequest
-        description: Stock to create
+        description: Stock create request.
         schema:
           $ref: '#/definitions/CreateStockRequestDTO'
       responses:
         '201':
-          description: Stock Created Successfully
+          description: Stock Created Successfully.
           schema:
             $ref: '#/definitions/StockDetailResponse'
         '400':
@@ -116,9 +115,10 @@ paths:
         required: true
         type: integer
         format: int64
+        minimum: 0
       responses:
         '200':
-          description: Stock was successfully found
+          description: Stock was successfully found.
           schema:
             $ref: '#/definitions/StockDetailResponse'
         '401':
@@ -152,14 +152,15 @@ paths:
         required: true
         type: integer
         format: int64
+        minimum: 0
       - in: body
         name: StockRequest
-        description: Stock to create
+        description: Stock update request.
         schema:
           $ref: '#/definitions/UpdateStockRequestDTO'
       responses:
         '200':
-          description: Stock was successfully updated
+          description: Stock was successfully updated.
           schema:
             $ref: '#/definitions/StockDetailResponse'
         '400':
@@ -196,6 +197,7 @@ paths:
         required: true
         type: integer
         format: int64
+        minimum: 0
       responses:
         '204':
           description: Stock was successfully deleted.
@@ -228,13 +230,20 @@ definitions:
         example: 98232913455
       stockName:
         type: string
+        minLength: 1
         description: Name of the stock.
         example: payconiqStock
       currentPrice:
         type: number
         format: double
+        minimum: 0.0
         description: Current price of the stock.
         example: 16.6
+      created:
+        type: string
+        format: date-time
+        description: Created time of the stock.
+        example: '2019-06-25T17:32:28Z'
       lastUpdated:
         type: string
         format: date-time
@@ -250,17 +259,21 @@ definitions:
           $ref: '#/definitions/StockDetailResponse'
       size:
         type: integer
-        minimum: 0
+        minimum: 1
+        maximum: 100
         description: current page size.
       number:
         type: integer
+        minimum: 0
         description: current page number.
       totalPages:
         type: integer
+        minimum: 0
         description: total pages.
       totalElements:
         type: integer
         format: int64
+        minimum: 0
         description: total elements.
 
   CreateStockRequestDTO:
@@ -268,11 +281,13 @@ definitions:
     properties:
       stockName:
         type: string
+        minLength: 1
         description: Name of the stock.
         example: payconiqStock
       currentPrice:
         type: number
         format: double
+        minimum: 0.0
         description: Current price of the stock.
         example: 16.6
     required:
@@ -285,6 +300,7 @@ definitions:
       currentPrice:
         type: number
         format: double
+        minimum: 0.0
         description: Current price of the stock.
         example: 16.6
     required:
@@ -299,6 +315,7 @@ definitions:
       error:
         description: Error description in human readble format.
         type: string
+        minLength: 1
       message:
         description: Reason the error occured.
         type: string
@@ -310,6 +327,7 @@ definitions:
       path:
         description: Path/Uri to invalid resource.
         type: string
+        minLength: 1
     required:
     - code
     - message

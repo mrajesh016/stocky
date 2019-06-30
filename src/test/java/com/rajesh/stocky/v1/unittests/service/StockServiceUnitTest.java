@@ -17,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -35,7 +35,7 @@ public class StockServiceUnitTest {
     public void testGetStocksById() {
         Stock stock = new Stock("testStock",16.6);
         stock.setStockId(4116L);
-        when(stockRepository.findByStockId(4116L)).thenReturn(stock);
+        when(stockRepository.findByStockId(4116L)).thenReturn(Optional.of(stock));
 
         StockDetailSRO detailSRO = stockService.getStockById(4116L);
         assertThat(detailSRO.getStockName()).isEqualTo("testStock");

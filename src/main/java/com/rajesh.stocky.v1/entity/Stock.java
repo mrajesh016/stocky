@@ -1,15 +1,17 @@
 package com.rajesh.stocky.v1.entity;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.Clock;
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "stock")
-@Getter @Setter @NoArgsConstructor @EqualsAndHashCode(exclude = {"lastUpdated"}) @ToString
+@Getter @Setter @NoArgsConstructor @EqualsAndHashCode(exclude = {"lastUpdated", "created"}) @ToString
 public class Stock implements Serializable {
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name="stock_id")
@@ -22,11 +24,15 @@ public class Stock implements Serializable {
     private Double currentPrice;
 
     @Column(name="last_updated")
-    private OffsetDateTime lastUpdated = OffsetDateTime.now();
+    @UpdateTimestamp
+    private OffsetDateTime lastUpdated;
+
+    @Column(name="created")
+    @CreationTimestamp
+    private OffsetDateTime created;
 
     public Stock(String stockName, Double currentPrice) {
         this.stockName = stockName;
         this.currentPrice = currentPrice;
-        this.lastUpdated = OffsetDateTime.now(Clock.systemDefaultZone());
     }
 }

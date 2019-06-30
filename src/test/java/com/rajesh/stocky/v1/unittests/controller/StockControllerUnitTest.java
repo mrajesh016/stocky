@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +55,7 @@ public class StockControllerUnitTest {
     public void testDeleteStockWhenStockExists() {
         Stock stock = new Stock("testDeleteStock",16.6);
         stock.setStockId(6428L);
-        when(stockRepository.findByStockId(6428L)).thenReturn(stock);
+        when(stockRepository.findByStockId(6428L)).thenReturn(Optional.of(stock));
 
         ResponseEntity<Void> response = stocksApi.deleteStockById(6428L);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -61,7 +63,7 @@ public class StockControllerUnitTest {
 
     @Test
     public void testDeleteStockWhenStockNotExists() {
-        when(stockRepository.findByStockId(6428L)).thenReturn(null);
+        when(stockRepository.findByStockId(6428L)).thenReturn(Optional.empty());
         Throwable thrown = catchThrowable(() -> stocksApi.deleteStockById(6428L));
         assertThat(thrown).hasMessageContaining("No stock entity exists for given stockId.");
     }
@@ -70,7 +72,7 @@ public class StockControllerUnitTest {
     public void testGetStockWhenStockExists() {
         Stock stock = new Stock("testGetStock",9.4);
         stock.setStockId(6428L);
-        when(stockRepository.findByStockId(6428L)).thenReturn(stock);
+        when(stockRepository.findByStockId(6428L)).thenReturn(Optional.of(stock));
 
         ResponseEntity<StockDetailResponse> response = stocksApi.getStockById(6428L);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -80,7 +82,7 @@ public class StockControllerUnitTest {
 
     @Test
     public void testGetStockWhenStockNotExists() {
-        when(stockRepository.findByStockId(6428L)).thenReturn(null);
+        when(stockRepository.findByStockId(6428L)).thenReturn(Optional.empty());
         Throwable thrown = catchThrowable(() -> stocksApi.getStockById(6428L));
         assertThat(thrown).hasMessageContaining("No stock entity exists for given stockId.");
     }
@@ -126,7 +128,7 @@ public class StockControllerUnitTest {
     @Test
     public void testGetStockListInvalidPageSize() {
         Throwable thrown = catchThrowable(() -> stocksApi.getStocksList(2,500));
-        assertThat(thrown).hasMessageContaining("Page size should be between 1 to 100.");
+        assertThat(thrown).hasMessageContaining("getStocksList.size: must be less than or equal to 100");
     }
 
     @Test
@@ -135,7 +137,7 @@ public class StockControllerUnitTest {
         stock.setStockId(2694L);
         Stock updatedStock = new Stock("testUpdateStock",9.3);
         updatedStock.setStockId(2694L);
-        when(stockRepository.findByStockId(2694L)).thenReturn(stock);
+        when(stockRepository.findByStockId(2694L)).thenReturn(Optional.of(stock));
         when(stockRepository.save(updatedStock)).thenReturn(updatedStock);
 
         UpdateStockRequestDTO request = new UpdateStockRequestDTO();
@@ -150,7 +152,7 @@ public class StockControllerUnitTest {
     public void testUpdateStockWhenStockNotExists() {
         UpdateStockRequestDTO request = new UpdateStockRequestDTO();
         request.setCurrentPrice(9.3);
-        when(stockRepository.findByStockId(2694L)).thenReturn(null);
+        when(stockRepository.findByStockId(2694L)).thenReturn(Optional.empty());
         Throwable thrown = catchThrowable(() -> stocksApi.updateStockById(2694L, request));
         assertThat(thrown).hasMessageContaining("No stock entity exists for given stockId.");
     }

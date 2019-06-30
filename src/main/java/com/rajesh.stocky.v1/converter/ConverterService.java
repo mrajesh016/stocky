@@ -24,25 +24,20 @@ public class ConverterService {
     }
 
     public Stock convertToEntity(CreateStockRequestDTO stockRequestDTO) throws ParseException {
-        Stock stock = modelMapper.map(stockRequestDTO, Stock.class);
-        return stock;
+        return modelMapper.map(stockRequestDTO, Stock.class);
     }
 
     public StockDetailResponse convertToResponseDTO(StockDetailSRO stockDetailSRO) {
-        if (stockDetailSRO ==null) return null;
-        StockDetailResponse stockInfoDTO = modelMapper.map(stockDetailSRO, StockDetailResponse.class);
-        return stockInfoDTO;
+        return  modelMapper.map(stockDetailSRO, StockDetailResponse.class);
     }
 
     public StockListResponse convertToResponseDTO(StocksDetailListSRO listDetailSRO) {
         if (listDetailSRO ==null) return null;
-
         StockListResponse listResponse = new StockListResponse();
         List<StockDetailResponse> detailResponses = new ArrayList<>();
         for (StockDetailSRO detailSRO: listDetailSRO.getStockDetailSROs()){
             detailResponses.add(modelMapper.map(detailSRO, StockDetailResponse.class));
         }
-
         listResponse.setSize(listDetailSRO.getSize());
         listResponse.setNumber(listDetailSRO.getNumber());
         listResponse.setTotalPages(listDetailSRO.getTotalPages());
@@ -52,25 +47,22 @@ public class ConverterService {
     }
 
     public StockDetailSRO convertToSRO(Stock stock){
-        if (stock ==null) return null;
-        StockDetailSRO stockDetailSRO = modelMapper.map(stock, StockDetailSRO.class);
-        return stockDetailSRO;
+        return modelMapper.map(stock, StockDetailSRO.class);
     }
 
     public StocksDetailListSRO convertToSRO(Page<Stock> stocks){
         if (stocks == null) return null;
-        StocksDetailListSRO stocksDetailListSRO = new StocksDetailListSRO();
         List<StockDetailSRO> sroList =  new ArrayList<>();
         List<Stock> stockEntities = stocks.getContent();
         for (Stock stock: stockEntities){
             StockDetailSRO stockDetailSRO = modelMapper.map(stock, StockDetailSRO.class);
             sroList.add(stockDetailSRO);
         }
-        stocksDetailListSRO.setSize(stocks.getSize());
-        stocksDetailListSRO.setNumber(stocks.getNumber());
-        stocksDetailListSRO.setTotalPages(stocks.getTotalPages());
-        stocksDetailListSRO.setTotalElements(stocks.getTotalElements());
-        stocksDetailListSRO.setStockDetailSROs(sroList);
-        return stocksDetailListSRO;
+        return StocksDetailListSRO.builder().size(stocks.getSize())
+                                            .number(stocks.getNumber())
+                                            .totalElements(stocks.getTotalElements())
+                                            .totalPages(stocks.getTotalPages())
+                                            .stockDetailSROs(sroList)
+                                            .build();
     }
 }

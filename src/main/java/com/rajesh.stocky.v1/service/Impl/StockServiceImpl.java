@@ -1,6 +1,5 @@
 package com.rajesh.stocky.v1.service.Impl;
 
-
 import com.rajesh.stocky.v1.converter.ConverterService;
 import com.rajesh.stocky.v1.entity.Stock;
 import com.rajesh.stocky.v1.sro.StockDetailSRO;
@@ -11,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
 @Service("stockService")
 public class StockServiceImpl implements IStockService {
@@ -28,14 +29,15 @@ public class StockServiceImpl implements IStockService {
     }
 
     @Override
+    @Transactional
     public void deleteStockById(Long stockId) {
         stockRepository.deleteByStockId(stockId);
     }
 
     @Override
     public StockDetailSRO getStockById(Long stockId) {
-        Stock stockEntity = stockRepository.findByStockId(stockId);
-        return converterService.convertToSRO(stockEntity);
+        Optional<Stock> stockEntity = stockRepository.findByStockId(stockId);
+        return stockEntity.map(stock -> converterService.convertToSRO(stock)).orElse(null);
     }
 
     @Override
