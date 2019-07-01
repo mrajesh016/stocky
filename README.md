@@ -1,13 +1,18 @@
 # Stocky Service
 Stock Service on Spring Boot  
+All endpoints require Basic Auth credentials: stocky/stocky
 
+## Build
+run `mvn clean package` 
 
-## Setup & Starting the Server  
-1. run `mvn clean generate-resources` to build the client-code related to stocky-server.yml
-2. run `mvn spring-boot:run`      
+## Run Stocky 
+run `mvn spring-boot:run`      
 
-
-You can view the api documentation in swagger-ui by pointing to  
+## Swagger UI
 http://localhost:8080/swagger-ui.html
 
-Change default port value in application.properties
+## Integration & Unit Tests
+`mvn clean verify` to run all unit and integration tests.
+
+## Code Coverage
+view unit tests code coverage report at: `target/site/jacoco/index.html`.
