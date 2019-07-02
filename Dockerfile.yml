@@ -3,4 +3,4 @@ COPY ./src/main/resources/application.properties /stocky/
 COPY ./target/stocky-*-SNAPSHOT.jar /stocky/
 WORKDIR /stocky
 EXPOSE 8080
-CMD ["sh", "-c", "java -jar ${JAVA_OPTS} -Dspring.config.location=file:///./application.properties $(echo stocky-*-SNAPSHOT.jar)"]
+CMD ["sh", "-c", "java -jar ${JAVA_OPTS} -Dspring.config.location=file:application.properties $(echo stocky-*-SNAPSHOT.jar)"]
