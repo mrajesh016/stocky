@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +53,48 @@ public class StockControllerUnitTest {
     }
 
     @Test
+    public void testCreateStockFailNegativePrice() {
+
+        CreateStockRequestDTO request = new CreateStockRequestDTO();
+        request.setStockName("testCreateStock");
+        request.setCurrentPrice(-16.6);
+        Throwable thrown = catchThrowable(() -> stocksApi.createStock(request));
+        assertThat(thrown).isOfAnyClassIn(ConstraintViolationException.class);
+        assertThat(thrown).hasMessageContaining("currentPrice: must be greater than or equal to 0.0");
+    }
+
+    @Test
+    public void testCreateStockFailNullPrice() {
+
+        CreateStockRequestDTO request = new CreateStockRequestDTO();
+        request.setStockName("testCreateStock");
+        Throwable thrown = catchThrowable(() -> stocksApi.createStock(request));
+        assertThat(thrown).isOfAnyClassIn(ConstraintViolationException.class);
+        assertThat(thrown).hasMessageContaining("currentPrice: must not be null");
+    }
+
+    @Test
+    public void testCreateStockFailEmptyName() {
+
+        CreateStockRequestDTO request = new CreateStockRequestDTO();
+        request.setStockName("");
+        request.setCurrentPrice(16.6);
+        Throwable thrown = catchThrowable(() -> stocksApi.createStock(request));
+        assertThat(thrown).isOfAnyClassIn(ConstraintViolationException.class);
+        assertThat(thrown).hasMessageContaining("stockName: size must be between 1 and 100");
+    }
+
+    @Test
+    public void testCreateStockFailNullName() {
+
+        CreateStockRequestDTO request = new CreateStockRequestDTO();
+        request.setCurrentPrice(16.6);
+        Throwable thrown = catchThrowable(() -> stocksApi.createStock(request));
+        assertThat(thrown).isOfAnyClassIn(ConstraintViolationException.class);
+        assertThat(thrown).hasMessageContaining("stockName: must not be null");
+    }
+
+      @Test
     public void testDeleteStockWhenStockExists() {
         Stock stock = new Stock("testDeleteStock",16.6);
         stock.setStockId(6428L);
@@ -66,6 +109,13 @@ public class StockControllerUnitTest {
         when(stockRepository.findByStockId(6428L)).thenReturn(Optional.empty());
         Throwable thrown = catchThrowable(() -> stocksApi.deleteStockById(6428L));
         assertThat(thrown).hasMessageContaining("No stock entity exists for given stockId.");
+    }
+
+    @Test
+    public void testDeleteStockWithInvalidId() {
+        Throwable thrown = catchThrowable(() -> stocksApi.deleteStockById(-24L));
+        assertThat(thrown).isOfAnyClassIn(ConstraintViolationException.class);
+        assertThat(thrown).hasMessageContaining("stockId: must be greater than or equal to 0");
     }
 
     @Test
@@ -85,6 +135,12 @@ public class StockControllerUnitTest {
         when(stockRepository.findByStockId(6428L)).thenReturn(Optional.empty());
         Throwable thrown = catchThrowable(() -> stocksApi.getStockById(6428L));
         assertThat(thrown).hasMessageContaining("No stock entity exists for given stockId.");
+    }
+
+    @Test
+    public void testGetStockWithInvalidId() {
+        Throwable thrown = catchThrowable(() -> stocksApi.getStockById(-72L));
+        assertThat(thrown).hasMessageContaining("stockId: must be greater than or equal to 0");
     }
 
     @Test
@@ -157,5 +213,21 @@ public class StockControllerUnitTest {
         assertThat(thrown).hasMessageContaining("No stock entity exists for given stockId.");
     }
 
+    @Test
+    public void testUpdateStockWithInvalidId() {
+        UpdateStockRequestDTO request = new UpdateStockRequestDTO();
+        request.setCurrentPrice(9.3);
+        Throwable thrown = catchThrowable(() -> stocksApi.updateStockById(-29L,request));
+        assertThat(thrown).hasMessageContaining("updateStockById.stockId: must be greater than or equal to 0");
+    }
+
+    @Test
+    public void testUpdateStockWithInvalidUpdateRequest() {
+        UpdateStockRequestDTO request = new UpdateStockRequestDTO();
+        request.setCurrentPrice(-9.3);
+        Throwable thrown = catchThrowable(() -> stocksApi.updateStockById(16L,request));
+        System.out.println(thrown);
+        assertThat(thrown).hasMessageContaining("updateStockById.stockRequest.currentPrice: must be greater than or equal to 0.0");
+    }
 
 }

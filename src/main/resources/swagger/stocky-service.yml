@@ -231,6 +231,7 @@ definitions:
       stockName:
         type: string
         minLength: 1
+        maxLength: 100
         description: Name of the stock.
         example: payconiqStock
       currentPrice:
@@ -282,6 +283,7 @@ definitions:
       stockName:
         type: string
         minLength: 1
+        maxLength: 100
         description: Name of the stock.
         example: payconiqStock
       currentPrice:

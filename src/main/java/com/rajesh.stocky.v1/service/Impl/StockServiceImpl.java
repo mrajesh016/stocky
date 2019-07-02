@@ -2,8 +2,8 @@ package com.rajesh.stocky.v1.service.Impl;
 
 import com.rajesh.stocky.v1.converter.ConverterService;
 import com.rajesh.stocky.v1.entity.Stock;
-import com.rajesh.stocky.v1.sro.StockDetailSRO;
-import com.rajesh.stocky.v1.sro.StocksDetailListSRO;
+import com.rajesh.stocky.v1.dto.StockDetailDTO;
+import com.rajesh.stocky.v1.dto.StocksDetailListDTO;
 import com.rajesh.stocky.v1.repository.StockRepository;
 import com.rajesh.stocky.v1.service.IStockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +23,9 @@ public class StockServiceImpl implements IStockService {
     private ConverterService converterService;
 
     @Override
-    public StockDetailSRO saveStock(Stock stock) {
+    public StockDetailDTO saveOrUpdateStock(Stock stock) {
         Stock stockEntity = stockRepository.save(stock);
-        return converterService.convertToSRO(stockEntity);
+        return converterService.convertToDTO(stockEntity);
     }
 
     @Override
@@ -35,15 +35,15 @@ public class StockServiceImpl implements IStockService {
     }
 
     @Override
-    public StockDetailSRO getStockById(Long stockId) {
+    public StockDetailDTO getStockById(Long stockId) {
         Optional<Stock> stockEntity = stockRepository.findByStockId(stockId);
-        return stockEntity.map(stock -> converterService.convertToSRO(stock)).orElse(null);
+        return stockEntity.map(stock -> converterService.convertToDTO(stock)).orElse(null);
     }
 
     @Override
-    public StocksDetailListSRO getAllStocksPaginated(Pageable pageableRequest) {
+    public StocksDetailListDTO getAllStocksPaginated(Pageable pageableRequest) {
         Page<Stock> stockentities = stockRepository.findAll(pageableRequest);
-        return converterService.convertToSRO(stockentities);
+        return converterService.convertToDTO(stockentities);
     }
 
 }

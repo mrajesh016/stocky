@@ -1,10 +1,10 @@
-package com.rajesh.stocky.v1.sro;
+package com.rajesh.stocky.v1.dto;
 
 import lombok.*;
 import java.time.OffsetDateTime;
 
 @Getter @Setter @NoArgsConstructor @EqualsAndHashCode(exclude = {"lastUpdated", "created"}) @ToString
-public class StockDetailSRO {
+public class StockDetailDTO {
 
     private Long stockId;
     private String stockName;
@@ -12,7 +12,7 @@ public class StockDetailSRO {
     private OffsetDateTime lastUpdated;
     private OffsetDateTime created;
 
-    public StockDetailSRO(String stockName, Double currentPrice) {
+    public StockDetailDTO(String stockName, Double currentPrice) {
         this.stockName = stockName;
         this.currentPrice = currentPrice;
     }

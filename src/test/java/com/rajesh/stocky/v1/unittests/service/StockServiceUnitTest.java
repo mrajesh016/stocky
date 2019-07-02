@@ -1,8 +1,8 @@
 package com.rajesh.stocky.v1.unittests.service;
 
 import com.rajesh.stocky.v1.entity.Stock;
-import com.rajesh.stocky.v1.sro.StockDetailSRO;
-import com.rajesh.stocky.v1.sro.StocksDetailListSRO;
+import com.rajesh.stocky.v1.dto.StockDetailDTO;
+import com.rajesh.stocky.v1.dto.StocksDetailListDTO;
 import com.rajesh.stocky.v1.repository.StockRepository;
 import com.rajesh.stocky.v1.service.IStockService;
 import org.junit.Test;
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -32,15 +33,22 @@ public class StockServiceUnitTest {
     private StockRepository stockRepository;
 
     @Test
-    public void testGetStocksById() {
+    public void testGetStockByIdExists() {
         Stock stock = new Stock("testStock",16.6);
         stock.setStockId(4116L);
         when(stockRepository.findByStockId(4116L)).thenReturn(Optional.of(stock));
 
-        StockDetailSRO detailSRO = stockService.getStockById(4116L);
-        assertThat(detailSRO.getStockName()).isEqualTo("testStock");
-        assertThat(detailSRO.getCurrentPrice()).isEqualTo(16.6);
-        assertThat(detailSRO.getStockId()).isEqualTo(4116L);
+        StockDetailDTO detailDTO = stockService.getStockById(4116L);
+        assertThat(detailDTO.getStockName()).isEqualTo("testStock");
+        assertThat(detailDTO.getCurrentPrice()).isEqualTo(16.6);
+        assertThat(detailDTO.getStockId()).isEqualTo(4116L);
+    }
+
+    @Test
+    public void testGetStockByIdNotExists() {
+        when(stockRepository.findByStockId(4116L)).thenReturn(Optional.empty());
+        StockDetailDTO detailDTO = stockService.getStockById(4116L);
+        assertThat(detailDTO).isEqualTo(null);
     }
 
     @Test
@@ -53,16 +61,17 @@ public class StockServiceUnitTest {
 
         Pageable pageableRequest = PageRequest.of(0, 15);
         when(stockRepository.findAll(pageableRequest)).thenReturn(stocksPaginated);
-        StocksDetailListSRO responseSRO = stockService.getAllStocksPaginated(pageableRequest);
+        StocksDetailListDTO responseDTO = stockService.getAllStocksPaginated(pageableRequest);
 
-        List<StockDetailSRO> stockDetailSROs = new ArrayList<>();
-        StockDetailSRO stockSRO1 = new StockDetailSRO("testStock1",16.6);stockSRO1.setStockId(4116L);
-        StockDetailSRO stockSRO2 = new StockDetailSRO("testStock2",14.2);stockSRO2.setStockId(8462L);
-        stockDetailSROs.add(stockSRO1);stockDetailSROs.add(stockSRO2);
+        List<StockDetailDTO> stockDetailDTOS = new ArrayList<>();
+        StockDetailDTO stockDTO1 = new StockDetailDTO("testStock1",16.6);stockDTO1.setStockId(4116L);
+        StockDetailDTO stockDTO2 = new StockDetailDTO("testStock2",14.2);stockDTO2.setStockId(8462L);
+        stockDetailDTOS.add(stockDTO1);
+        stockDetailDTOS.add(stockDTO2);
 
-        assertThat(responseSRO.getTotalPages()).isEqualTo(1);
-        assertThat(responseSRO.getTotalElements()).isEqualTo(2);
-        assertThat(responseSRO.getStockDetailSROs()).isEqualTo(stockDetailSROs);
+        assertThat(responseDTO.getTotalPages()).isEqualTo(1);
+        assertThat(responseDTO.getTotalElements()).isEqualTo(2);
+        assertThat(responseDTO.getStockDetailDTOS()).isEqualTo(stockDetailDTOS);
     }
 
     @Test
@@ -71,10 +80,10 @@ public class StockServiceUnitTest {
         stock.setStockId(4116L);
         when(stockRepository.save(stock)).thenReturn(stock);
 
-        StockDetailSRO stockDetailSRO = stockService.saveStock(stock);
-        assertThat(stockDetailSRO.getStockName()).isEqualTo("testStock");
-        assertThat(stockDetailSRO.getCurrentPrice()).isEqualTo(16.6);
-        assertThat(stockDetailSRO.getStockId()).isEqualTo(4116L);
+        StockDetailDTO stockDetailDTO = stockService.saveOrUpdateStock(stock);
+        assertThat(stockDetailDTO.getStockName()).isEqualTo("testStock");
+        assertThat(stockDetailDTO.getCurrentPrice()).isEqualTo(16.6);
+        assertThat(stockDetailDTO.getStockId()).isEqualTo(4116L);
     }
 
 

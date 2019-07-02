@@ -1,10 +1,11 @@
-package com.rajesh.stocky.v1.integrationtests;
+package com.rajesh.stocky.v1.it;
 
 import com.rajesh.stocky.v1.StockyApplication;
 import com.rajesh.stocky.v1.swagger.model.CreateStockRequestDTO;
 import com.rajesh.stocky.v1.swagger.model.StockDetailResponse;
 import com.rajesh.stocky.v1.swagger.model.StockListResponse;
 import com.rajesh.stocky.v1.swagger.model.UpdateStockRequestDTO;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,19 @@ public class StocksApiIntegrationIT {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    HttpHeaders headers;
+
+    @Before
+    public void testInit() {
+        headers = new HttpHeaders();
+        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
+    }
+
     @Test
     public void testCreateStockSuccess() {
         CreateStockRequestDTO createStockRequest = new CreateStockRequestDTO();
         createStockRequest.setCurrentPrice(4.9);
         createStockRequest.setStockName("payconiqStockCreateTest");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity<CreateStockRequestDTO> request = new HttpEntity<>(createStockRequest, headers);
 
         ResponseEntity<StockDetailResponse> response = restTemplate.postForEntity(createURLWithPort("/api/stocks/"), request, StockDetailResponse.class);
@@ -46,12 +52,9 @@ public class StocksApiIntegrationIT {
     }
 
     @Test
-    public void testCreateStockBadRequest() {
+    public void testCreateStockFailNullPrice() {
         CreateStockRequestDTO createStockRequest = new CreateStockRequestDTO();
         createStockRequest.setStockName("payconiqStockCreateTest");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity<CreateStockRequestDTO> request = new HttpEntity<>(createStockRequest, headers);
 
         ResponseEntity<StockDetailResponse> response = restTemplate.postForEntity(createURLWithPort("/api/stocks/"), request, StockDetailResponse.class);
@@ -59,11 +62,52 @@ public class StocksApiIntegrationIT {
     }
 
     @Test
-    public void testGetStockByIdWhenExists() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
-        HttpEntity entity = new HttpEntity(headers);
+    public void testCreateStockFailInvalidPrice() {
+        CreateStockRequestDTO createStockRequest = new CreateStockRequestDTO();
+        createStockRequest.setStockName("payconiqStockCreateTest");
+        createStockRequest.setCurrentPrice(-72.3);
+        HttpEntity<CreateStockRequestDTO> request = new HttpEntity<>(createStockRequest, headers);
 
+        ResponseEntity<StockDetailResponse> response = restTemplate.postForEntity(createURLWithPort("/api/stocks/"), request, StockDetailResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void testCreateStockFailNullName() {
+        CreateStockRequestDTO createStockRequest = new CreateStockRequestDTO();
+        createStockRequest.setCurrentPrice(22.8);
+        HttpEntity<CreateStockRequestDTO> request = new HttpEntity<>(createStockRequest, headers);
+
+        ResponseEntity<StockDetailResponse> response = restTemplate.postForEntity(createURLWithPort("/api/stocks/"), request, StockDetailResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void testCreateStockFailEmptyName() {
+        CreateStockRequestDTO createStockRequest = new CreateStockRequestDTO();
+        createStockRequest.setStockName("");
+        createStockRequest.setCurrentPrice(22.8);
+        HttpEntity<CreateStockRequestDTO> request = new HttpEntity<>(createStockRequest, headers);
+
+        ResponseEntity<StockDetailResponse> response = restTemplate.postForEntity(createURLWithPort("/api/stocks/"), request, StockDetailResponse.class);
+        System.out.println(response);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void testCreateStockFailUnauthorized() {
+        CreateStockRequestDTO createStockRequest = new CreateStockRequestDTO();
+        createStockRequest.setCurrentPrice(22.8);
+        headers.set("Authorization", "Basic sdf3RvY2tOnN0b2NreQ==");
+        HttpEntity<CreateStockRequestDTO> request = new HttpEntity<>(createStockRequest, headers);
+
+        ResponseEntity<StockDetailResponse> response = restTemplate.postForEntity(createURLWithPort("/api/stocks/"), request, StockDetailResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    public void testGetStockByIdWhenExists() {
+        HttpEntity entity = new HttpEntity(headers);
         ResponseEntity<StockDetailResponse> response = restTemplate.exchange(createURLWithPort("/api/stocks/942876"), HttpMethod.GET, entity, StockDetailResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -73,38 +117,27 @@ public class StocksApiIntegrationIT {
 
     @Test
     public void testGetStockByIdWhenNotExists() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
-
         ResponseEntity<StockDetailResponse> response = restTemplate.exchange(createURLWithPort("/api/stocks/23421"), HttpMethod.GET, entity, StockDetailResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
     public void testDeleteStockByIdWhenExists() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
-
         ResponseEntity<Void> response = restTemplate.exchange(createURLWithPort("/api/stocks/716833"), HttpMethod.DELETE, entity, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @Test
     public void testDeleteStockByIdWhenNotExists() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
-
         ResponseEntity<Void> response = restTemplate.exchange(createURLWithPort("/api/stocks/43532"), HttpMethod.DELETE, entity, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
     public void testGetStockListSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(createURLWithPort("/api/stocks/"))
                 .queryParam("page", 0)
@@ -116,8 +149,6 @@ public class StocksApiIntegrationIT {
 
     @Test
     public void testGetStockListPageOutOfBound() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(createURLWithPort("/api/stocks/"))
                 .queryParam("page", 5)
@@ -129,8 +160,6 @@ public class StocksApiIntegrationIT {
 
     @Test
     public void testGetStockListInvalidPageSize() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity entity = new HttpEntity(headers);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(createURLWithPort("/api/stocks/"))
                 .queryParam("page", 0)
@@ -140,22 +169,9 @@ public class StocksApiIntegrationIT {
     }
 
     @Test
-    public void testUpdateStockBadRequest() {
-        UpdateStockRequestDTO updateStockRequest = new UpdateStockRequestDTO();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
-        HttpEntity<UpdateStockRequestDTO> request = new HttpEntity<>(updateStockRequest, headers);
-
-        ResponseEntity<StockDetailResponse> response = restTemplate.exchange(createURLWithPort("/api/stocks/678223"), HttpMethod.PUT, request, StockDetailResponse.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
     public void testUpdateStockWhenExists() {
         UpdateStockRequestDTO updateStockRequest = new UpdateStockRequestDTO();
         updateStockRequest.setCurrentPrice(105.6);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity<UpdateStockRequestDTO> request = new HttpEntity<>(updateStockRequest, headers);
 
         ResponseEntity<StockDetailResponse> response = restTemplate.exchange(createURLWithPort("/api/stocks/678223"), HttpMethod.PUT, request, StockDetailResponse.class);
@@ -168,12 +184,20 @@ public class StocksApiIntegrationIT {
     public void testUpdateStockWhenNotExists() {
         UpdateStockRequestDTO updateStockRequest = new UpdateStockRequestDTO();
         updateStockRequest.setCurrentPrice(105.6);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic c3RvY2t5OnN0b2NreQ==");
         HttpEntity<UpdateStockRequestDTO> request = new HttpEntity<>(updateStockRequest, headers);
 
         ResponseEntity<StockDetailResponse> response = restTemplate.exchange(createURLWithPort("/api/stocks/436622"), HttpMethod.PUT, request, StockDetailResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void testUpdateStockFailInvalidPrice() {
+        UpdateStockRequestDTO updateStockRequest = new UpdateStockRequestDTO();
+        updateStockRequest.setCurrentPrice(-89.24);
+        HttpEntity<UpdateStockRequestDTO> request = new HttpEntity<>(updateStockRequest, headers);
+
+        ResponseEntity<StockDetailResponse> response = restTemplate.exchange(createURLWithPort("/api/stocks/678223"), HttpMethod.PUT, request, StockDetailResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     private String createURLWithPort(String uri) {

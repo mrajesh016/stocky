@@ -2,7 +2,7 @@ package com.rajesh.stocky.v1.controller;
 
 import com.rajesh.stocky.v1.swagger.api.StocksApi;
 import com.rajesh.stocky.v1.converter.ConverterService;
-import com.rajesh.stocky.v1.sro.*;
+import com.rajesh.stocky.v1.dto.*;
 import com.rajesh.stocky.v1.service.IStockService;
 import com.rajesh.stocky.v1.swagger.model.CreateStockRequestDTO;
 import com.rajesh.stocky.v1.swagger.model.StockDetailResponse;
@@ -15,15 +15,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import java.util.Optional;
 
 @Validated
-@Controller
+@RestController
 public class StocksApiController implements StocksApi {
 
     private static final Logger logger = LoggerFactory.getLogger(StocksApiController.class);
@@ -33,13 +34,12 @@ public class StocksApiController implements StocksApi {
     @Autowired
     private ConverterService converterService;
 
-    @Validated
     @Override
     public ResponseEntity<StockDetailResponse> createStock(@Valid @RequestBody CreateStockRequestDTO createStockRequest) {
 
         StockDetailResponse response;
-        StockDetailSRO stockDetailSRO = stockService.saveStock(converterService.convertToEntity(createStockRequest));
-        response = converterService.convertToResponseDTO(stockDetailSRO);
+        StockDetailDTO stockDetailDTO = stockService.saveOrUpdateStock(converterService.convertToEntity(createStockRequest));
+        response = converterService.convertToResponseDTO(stockDetailDTO);
         logger.info("Stock:{} successfully created", response);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -47,8 +47,8 @@ public class StocksApiController implements StocksApi {
     @Override
     public ResponseEntity<Void> deleteStockById(@Min(0) @PathVariable("stockId") Long stockId) {
 
-        StockDetailSRO stock = stockService.getStockById(stockId);
-        if (stock == null) {
+        Optional<StockDetailDTO> stock = Optional.ofNullable(stockService.getStockById(stockId));
+        if (!stock.isPresent()) {
             logger.info("No stock exists with Id: {}", stockId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId.");
         }
@@ -61,12 +61,12 @@ public class StocksApiController implements StocksApi {
     public ResponseEntity<StockDetailResponse> getStockById(@Min(0) @PathVariable("stockId") Long stockId) {
 
         StockDetailResponse response;
-        StockDetailSRO stockDetailSRO = stockService.getStockById(stockId);
-        if (stockDetailSRO == null) {
+        Optional<StockDetailDTO> stockDetailDTO = Optional.ofNullable(stockService.getStockById(stockId));
+        if (!stockDetailDTO.isPresent()) {
             logger.info("No stock exists with Id: {}", stockId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId.");
         }
-        response = converterService.convertToResponseDTO(stockDetailSRO);
+        response = converterService.convertToResponseDTO(stockDetailDTO.get());
         logger.info("Stock Successfully found with Id: {}, Stock: {}", stockId, response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -76,28 +76,26 @@ public class StocksApiController implements StocksApi {
 
         StockListResponse response;
         Pageable pageableRequest = PageRequest.of(page, size);
-        StocksDetailListSRO stocksListSRO = stockService.getAllStocksPaginated(pageableRequest);
-        if (page >= stocksListSRO.getTotalPages() && page!=0){
+        StocksDetailListDTO stocksListDTO = stockService.getAllStocksPaginated(pageableRequest);
+        if (page >= stocksListDTO.getTotalPages() && page!=0){
             logger.info("Requested page: {} is out of bounds.", page);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested page is out of bounds.");
         }
-        response = converterService.convertToResponseDTO(stocksListSRO);
+        response = converterService.convertToResponseDTO(stocksListDTO);
         logger.info("Successful StockListResponse: {}", response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Validated
     @Override
     public ResponseEntity<StockDetailResponse> updateStockById(@Min(0) @PathVariable("stockId") Long stockId, @Valid @RequestBody UpdateStockRequestDTO updateStockRequest) {
 
         StockDetailResponse response;
-        StockDetailSRO stockDetailSRO = stockService.getStockById(stockId);
-        if (stockDetailSRO == null) {
+        Optional<StockDetailDTO> stockDetailDTO = Optional.ofNullable(stockService.getStockById(stockId));
+        if (!stockDetailDTO.isPresent()) {
             logger.info("No stock exists with Id: {} ", stockId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId.");
         }
-        stockDetailSRO = stockService.saveStock(converterService.updateStock(stockDetailSRO, updateStockRequest));
-        response = converterService.convertToResponseDTO(stockDetailSRO);
+        response = converterService.convertToResponseDTO(stockService.saveOrUpdateStock(converterService.updateAndConvertToStock(stockDetailDTO.get(), updateStockRequest)));
         logger.info("Stock Successfully updated with Id:{} to Stock: {}", stockId, response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

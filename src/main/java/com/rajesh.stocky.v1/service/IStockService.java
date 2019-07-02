@@ -1,13 +1,13 @@
 package com.rajesh.stocky.v1.service;
 
+import com.rajesh.stocky.v1.dto.StocksDetailListDTO;
 import com.rajesh.stocky.v1.entity.Stock;
-import com.rajesh.stocky.v1.sro.StockDetailSRO;
-import com.rajesh.stocky.v1.sro.StocksDetailListSRO;
+import com.rajesh.stocky.v1.dto.StockDetailDTO;
 import org.springframework.data.domain.Pageable;
 
 public interface IStockService{
-    StockDetailSRO saveStock(Stock stock);
+    StockDetailDTO saveOrUpdateStock(Stock stock);
     void deleteStockById(Long stockId);
-    StockDetailSRO getStockById(Long stockId);
-    StocksDetailListSRO getAllStocksPaginated(Pageable pageableRequest);
+    StockDetailDTO getStockById(Long stockId);
+    StocksDetailListDTO getAllStocksPaginated(Pageable pageableRequest);
 }
