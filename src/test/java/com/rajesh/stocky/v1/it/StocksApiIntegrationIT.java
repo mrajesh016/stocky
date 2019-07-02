@@ -90,7 +90,6 @@ public class StocksApiIntegrationIT {
         HttpEntity<CreateStockRequestDTO> request = new HttpEntity<>(createStockRequest, headers);
 
         ResponseEntity<StockDetailResponse> response = restTemplate.postForEntity(createURLWithPort("/api/stocks/"), request, StockDetailResponse.class);
-        System.out.println(response);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 

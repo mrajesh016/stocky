@@ -47,8 +47,7 @@ public class StocksApiController implements StocksApi {
     @Override
     public ResponseEntity<Void> deleteStockById(@Min(0) @PathVariable("stockId") Long stockId) {
 
-        Optional<StockDetailDTO> stock = Optional.ofNullable(stockService.getStockById(stockId));
-        if (!stock.isPresent()) {
+        if (!stockService.getStockById(stockId).isPresent()) {
             logger.info("No stock exists with Id: {}", stockId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId.");
         }
@@ -61,12 +60,9 @@ public class StocksApiController implements StocksApi {
     public ResponseEntity<StockDetailResponse> getStockById(@Min(0) @PathVariable("stockId") Long stockId) {
 
         StockDetailResponse response;
-        Optional<StockDetailDTO> stockDetailDTO = Optional.ofNullable(stockService.getStockById(stockId));
-        if (!stockDetailDTO.isPresent()) {
-            logger.info("No stock exists with Id: {}", stockId);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId.");
-        }
-        response = converterService.convertToResponseDTO(stockDetailDTO.get());
+        StockDetailDTO stockDetailDTO = stockService.getStockById(stockId)
+                                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId."));
+        response = converterService.convertToResponseDTO(stockDetailDTO);
         logger.info("Stock Successfully found with Id: {}, Stock: {}", stockId, response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -90,12 +86,9 @@ public class StocksApiController implements StocksApi {
     public ResponseEntity<StockDetailResponse> updateStockById(@Min(0) @PathVariable("stockId") Long stockId, @Valid @RequestBody UpdateStockRequestDTO updateStockRequest) {
 
         StockDetailResponse response;
-        Optional<StockDetailDTO> stockDetailDTO = Optional.ofNullable(stockService.getStockById(stockId));
-        if (!stockDetailDTO.isPresent()) {
-            logger.info("No stock exists with Id: {} ", stockId);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId.");
-        }
-        response = converterService.convertToResponseDTO(stockService.saveOrUpdateStock(converterService.updateAndConvertToStock(stockDetailDTO.get(), updateStockRequest)));
+        StockDetailDTO stockDetailDTO = stockService.getStockById(stockId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No stock entity exists for given stockId."));
+        response = converterService.convertToResponseDTO(stockService.saveOrUpdateStock(converterService.updateAndConvertToStock(stockDetailDTO, updateStockRequest)));
         logger.info("Stock Successfully updated with Id:{} to Stock: {}", stockId, response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

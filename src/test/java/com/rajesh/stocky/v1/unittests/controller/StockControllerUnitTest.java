@@ -226,7 +226,6 @@ public class StockControllerUnitTest {
         UpdateStockRequestDTO request = new UpdateStockRequestDTO();
         request.setCurrentPrice(-9.3);
         Throwable thrown = catchThrowable(() -> stocksApi.updateStockById(16L,request));
-        System.out.println(thrown);
         assertThat(thrown).hasMessageContaining("updateStockById.stockRequest.currentPrice: must be greater than or equal to 0.0");
     }
 

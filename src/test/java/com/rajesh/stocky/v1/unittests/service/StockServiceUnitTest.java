@@ -38,7 +38,7 @@ public class StockServiceUnitTest {
         stock.setStockId(4116L);
         when(stockRepository.findByStockId(4116L)).thenReturn(Optional.of(stock));
 
-        StockDetailDTO detailDTO = stockService.getStockById(4116L);
+        StockDetailDTO detailDTO = stockService.getStockById(4116L).orElse(null);
         assertThat(detailDTO.getStockName()).isEqualTo("testStock");
         assertThat(detailDTO.getCurrentPrice()).isEqualTo(16.6);
         assertThat(detailDTO.getStockId()).isEqualTo(4116L);
@@ -47,8 +47,7 @@ public class StockServiceUnitTest {
     @Test
     public void testGetStockByIdNotExists() {
         when(stockRepository.findByStockId(4116L)).thenReturn(Optional.empty());
-        StockDetailDTO detailDTO = stockService.getStockById(4116L);
-        assertThat(detailDTO).isEqualTo(null);
+        assertThat(stockService.getStockById(4116L).isPresent()).isEqualTo(false);
     }
 
     @Test

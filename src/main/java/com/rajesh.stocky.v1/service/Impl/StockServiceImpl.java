@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service("stockService")
@@ -35,9 +37,9 @@ public class StockServiceImpl implements IStockService {
     }
 
     @Override
-    public StockDetailDTO getStockById(Long stockId) {
+    public Optional<StockDetailDTO> getStockById(Long stockId) {
         Optional<Stock> stockEntity = stockRepository.findByStockId(stockId);
-        return stockEntity.map(stock -> converterService.convertToDTO(stock)).orElse(null);
+        return stockEntity.map(stock -> Optional.of(converterService.convertToDTO(stock))).orElse(Optional.empty());
     }
 
     @Override
