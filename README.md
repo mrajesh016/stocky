@@ -197,7 +197,6 @@ curl -X PUT \
   -H 'Accept: application/json' \
   -H 'Authorization: Basic c3RvY2t5OnN0b2NreQ==' \
   -H 'Content-Type: application/json' \
-  -H 'Postman-Token: 3d4f62d3-7781-49de-9945-011b94814a56' \
   -H 'cache-control: no-cache' \
   -d '{
   "currentPrice": 95.4
