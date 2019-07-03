@@ -118,6 +118,8 @@
 						<exclude>**/swagger/**</exclude>
 						<exclude>**/v1/StockyApplication.class</exclude>
 						<exclude>**/v1/exceptions/**/*</exclude>
+						<exclude>**/v1/dto/**/*</exclude>
+						<exclude>**/v1/entity/**/*</exclude>
 					</excludes>
 				</configuration>
 				<executions>
