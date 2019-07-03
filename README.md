@@ -85,7 +85,8 @@ each layer performs as designed individually.
    mvn clean verify
    ```
 
-## Code Coverage [![Code coverage](https://img.shields.io/badge/code%20coverage-97%25-brightgreen.svg)](/jacoco.html)
+## Code Coverage [![Code coverage](https://img.shields.io/badge/code%20coverage-97%25-brightgreen.svg)](https://htmlpreview.github.io/?https://github.com/mrajesh016/stocky/blob/master/jacoco.html)
+
 view unit tests code coverage report at: `target/site/jacoco/index.html`.
 
 ## Actuator Endpoints
