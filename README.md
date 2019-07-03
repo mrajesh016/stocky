@@ -89,6 +89,131 @@ each layer performs as designed individually.
 
 view unit tests code coverage report at: `target/site/jacoco/index.html`.
 
+## API usage (Sample Curls)
+**POST /api/stocks/**
+```
+Request:
+
+curl -X POST \
+http://localhost:8080/api/stocks/ \
+-H 'Authorization: Basic c3RvY2t5OnN0b2NreQ==' \
+-H 'Content-Type: application/json' \
+-H 'cache-control: no-cache' \
+-d '{
+"currentPrice": 16.6,
+"stockName": "payconiqStock"
+}'
+  
+Response:
+
+{
+  "stockId": 1,
+  "stockName": "payconiqStock",
+  "currentPrice": 16.6,
+  "created": "2019-07-03T16:28:20.526+05:30",
+  "lastUpdated": "2019-07-03T16:28:20.526+05:30"
+}
+
+```
+
+**GET /api/stocks/1**
+```
+Request: 
+
+curl -X GET \
+  http://localhost:8080/api/stocks/1 \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Basic c3RvY2t5OnN0b2NreQ==' \
+  -H 'cache-control: no-cache'
+  
+Response:
+
+{
+  "stockId": 1,
+  "stockName": "payconiqStock",
+  "currentPrice": 16.6,
+  "created": "2019-07-03T16:28:20.526+05:30",
+  "lastUpdated": "2019-07-03T16:28:20.526+05:30"
+}
+```
+
+**GET /api/stocks/**
+```
+Request: 
+
+curl -X GET \
+  'http://localhost:8080/api/stocks/?page=0&size=2' \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Basic c3RvY2t5OnN0b2NreQ==' \
+  -H 'cache-control: no-cache'
+  
+Response:
+
+{
+    "stocksDetailList": [
+        {
+            "stockId": 1,
+            "stockName": "payconiqStock",
+            "currentPrice": 16.6,
+            "created": "2019-07-03T16:28:20.526+05:30",
+            "lastUpdated": "2019-07-03T16:28:20.526+05:30"
+        },
+        {
+            "stockId": 2,
+            "stockName": "NASDAQ:AAPL",
+            "currentPrice": 25.89,
+            "created": "2019-07-03T16:39:29.249+05:30",
+            "lastUpdated": "2019-07-03T16:39:29.249+05:30"
+        }
+    ],
+    "size": 2,
+    "number": 0,
+    "totalPages": 1,
+    "totalElements": 2
+}
+```
+
+**DELETE /api/stocks/1**
+```
+Request: 
+
+curl -X DELETE \
+  http://localhost:8080/api/stocks/1 \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Basic c3RvY2t5OnN0b2NreQ==' \
+  -H 'cache-control: no-cache'
+  
+Response:
+
+204 No Content 
+```
+
+**PUT /api/stocks/1**
+```
+Request:
+
+curl -X PUT \
+  http://localhost:8080/api/stocks/2 \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Basic c3RvY2t5OnN0b2NreQ==' \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 3d4f62d3-7781-49de-9945-011b94814a56' \
+  -H 'cache-control: no-cache' \
+  -d '{
+  "currentPrice": 95.4
+}'
+
+Response:
+
+{
+    "stockId": 2,
+    "stockName": "NASDAQ:AAPL",
+    "currentPrice": 95.4,
+    "created": "2019-07-03T16:39:29.249+05:30",
+    "lastUpdated": "2019-07-03T19:36:41.335+05:30"
+}
+```
+
 ## Actuator Endpoints
 Insights and metrics about running application of stocky.
 
