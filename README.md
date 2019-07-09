@@ -5,6 +5,8 @@
 
 Started with the API contract using OpenAPI specification(OAS) [stocky-service.yml](/src/main/resources/swagger/stocky-service.yml), and then *swagger-codegen* has been used to generate the client code stubs.
 
+All endpoints are BasicAuth protected **username/password : stocky/stocky.**
+
 ## Getting started
 
 ### Installation
