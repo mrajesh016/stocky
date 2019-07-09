@@ -6,6 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "stock")
@@ -13,7 +14,7 @@ import java.time.OffsetDateTime;
 public class Stock implements Serializable {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name="stock_id")
     private Long stockId;
 
